@@ -19,8 +19,12 @@
   </style>
   <link rel="stylesheet" href="https://bootswatch.com/4/lux/bootstrap.min.css">
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <body>
     <script>
+    
+
+
   function statusChangeCallback(response) {
     console.log('statusChangeCallback');
     console.log(response);
@@ -72,16 +76,58 @@
     js.src = "https://connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
-
+  let user = ''
   function testAPI() {
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log('Successful login for: ' + response.name);
+      localStorage.setItem('user', response.name)
       createNewUser(response.name)
       document.getElementById('status').innerHTML =
         'Thanks for logging in, ' + response.name + '!';
     });
   }
+  let dataBMI = ''
+
+    function getBMI () {
+      console.log($('#weight').val())
+      axios.post('http://localhost:3000/bmi', {
+        height: $('#height').val(),
+        weight: $('#weight').val()
+      })
+      .then(response => {
+        console.log(response.data)
+         dataBMI = response.data
+         axios.post('http://localhost:3000/users/updateBMI',{
+           bodyType: response.data.status,
+           name: localStorage.getItem('user')
+         })
+         .then(result => {
+           console.log(result)
+         })
+         .catch(err => {
+           console.log(err)
+         })
+        $(`.row`).append(`<div class="col-sm-4">
+            <div class="card border-success mb-3" style="max-width: 20rem;">
+            <div class="card-header">RESULT</div>
+            <div class="card-body text-success">
+              <h4 class="card-title">${response.data.status}</h4>
+              <p class="card-text">if you are a woman, your ideal weight is ${response.data.ideal_weight.woman}</p>
+              <p class="card-text">if you are a man, your ideal weight is ${response.data.ideal_weight.man}</p>
+            </div>
+          </div>
+          </div>
+          <button type="button" class="btn btn-outline-success" onclick="getRecipes()">Get Recipes</button>`)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+    }
+    
+    // function getRecipes () {
+    //   axios.get('http://localhost:3000/api/foods?q=')
+    // }
 </script>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="#">RBmI</a>
@@ -129,39 +175,6 @@
 <div class="row">
 
 </div>
-    
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script type="text/javascript">
-    let dataBMI = ''
-      function getBMI () {
-        console.log($('#weight').val())
-        axios.post('http://localhost:3000/bmi', {
-          height: $('#height').val(),
-          weight: $('#weight').val()
-        })
-        .then(response => {
-          console.log(response.data)
-           dataBMI = response.data
-          $(`.row`).append(`<div class="col-sm-4">
-              <div class="card border-success mb-3" style="max-width: 20rem;">
-              <div class="card-header">RESULT</div>
-              <div class="card-body text-success">
-                <h4 class="card-title">${response.data.status}</h4>
-                <p class="card-text">if you are a woman, your ideal weight is ${response.data.ideal_weight.woman}</p>
-                <p class="card-text">if you are a man, your ideal weight is ${response.data.ideal_weight.man}</p>
-              </div>
-            </div>
-            </div>
-            <button type="button" class="btn btn-outline-success" onclick="getRecipes()">Get Recipes</button>`)
-        })
-        .catch(err => {
-          console.log(err)
-        })
-      }
-      
-      // function getRecipes () {
-      //   axios.get('http://localhost:3000/api/foods?q=')
-      // }
-    </script>
+
   </body>
 </html>
