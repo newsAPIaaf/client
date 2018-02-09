@@ -33,7 +33,7 @@ axios.post('http://localhost:3000/users',{
 window.fbAsyncInit = function() {
 FB.init({
   appId      : '364179410749677',
-  cookie     : true,  // enable cookies to allow the server to access 
+  cookie     : true,  // enable cookies to allow the server to access
                       // the session
   xfbml      : true,  // parse social plugins on this page
   version    : 'v2.8' // use graph api version 2.8
@@ -55,9 +55,12 @@ fjs.parentNode.insertBefore(js, fjs);
 let user = ''
 function testAPI() {
 console.log('Welcome!  Fetching your information.... ');
-FB.api('/me', function(response) {
+FB.api('/me', {fields : 'id, email'} , function(response) {
   console.log('Successful login for: ' + response.name);
   localStorage.setItem('user', response.name)
+  localStorage.setItem('id', response.id)
+  localStorage.setItem('email', response.email)
+  console.log(response, 'respon fbapi');
   createNewUser(response.name)
   document.getElementById('status').innerHTML =
     'Thanks for logging in, ' + response.name + '!';
@@ -84,6 +87,7 @@ function getBMI () {
      .catch(err => {
        console.log(err)
      })
+    $(`#rowBMI`).html('')
     $(`#rowBMI`).append(`
         <div class="card border-success mb-3" style="max-width: 20rem;">
         <div class="card-header">RESULT</div>
@@ -91,15 +95,58 @@ function getBMI () {
           <h4 class="card-title">${response.data.status}</h4>
           <p class="card-text">if you are a woman, your ideal weight is ${response.data.ideal_weight.woman}</p>
           <p class="card-text">if you are a man, your ideal weight is ${response.data.ideal_weight.man}</p>
-          <button type="button" class="btn btn-outline-success" onclick="getRecipes()">Get Recipes</button>
+          <button type="button" class="btn btn-outline-success" onclick="getRecipes('')">Get Recipes</button>
+        </div>
+        <div class="row">
+          <button type="button" onclick="getRecipes('chicken', '${response.data.status}')" class="btn btn-primary btn-sm">Chicken</button>
+          <button type="button" onclick="getRecipes('beef', '${response.data.status}')" class="btn btn-primary btn-sm">Beef</button>
+          <button type="button" onclick="getRecipes('fish', '${response.data.status}')" class="btn btn-primary btn-sm">Fish</button>
         </div>
       </div>
-      
+
       `)
   })
   .catch(err => {
     console.log(err)
   })
+}
+
+function getRecipes(food, status) {
+  let result
+  axios.get(`http://localhost:3000/api/foods?q=${food}`)
+  .then(function (response) {
+    console.log(response.data.foods[0].diet[0]);
+    if (status.indexOf('Obesity') !== -1 || status.indexOf('Overweight') !== -1) {
+      result = response.data.foods.filter(food => {
+        return food.diet[0].indexOf('Low-Carb') !== -1
+      })
+    } else {
+      result = response.data.foods.filter(food => {
+        return food.diet[0].indexOf('Low-Carb') == -1
+      })
+    }
+    $(`#rowRecipes`).html('')
+    result.forEach(element_food => {
+      console.log(element_food);
+      $(`#rowRecipes`).append(`
+        <div class="col-3">
+          <div class="card border-success mb-3" style="max-width: 20rem;">
+            <div class="card-header">RESULT</div>
+            <div class="card-body text-success">
+              <h4 class="card-title">${element_food.name}</h4>
+              <p class="card-text">ingredients    : ${element_food.ingredient.join(', ')}</p>
+              <p class="card-text">health benefit : ${element_food.health.join(', ')}</p>
+              <button type="button" class="btn btn-outline-success" onclick="sentEmail()">Send Recipe</button>
+            </div>
+          </div>
+        </div>
+        `)
+    })
+
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
 }
 
 // function getRecipes () {
