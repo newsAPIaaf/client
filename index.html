@@ -3,132 +3,25 @@
   <head>
     <meta charset="utf-8">
     <title></title>
-    <script
-    src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <style media="screen">
+      .container {
+        margin-top: 40px;
+      }
+      #rowBMI {
+        display:-webkit-box !important;
+        flex-direction: column;
+        align-items: center;
+        margin-left: 80px !important;
+      }
+      .content {
+        margin-left: 80px;
+      }
+    </style>
+    <link rel="stylesheet" href="https://bootswatch.com/4/lux/bootstrap.min.css">
   </head>
-  <style media="screen">
-    .container {
-      margin-top: 40px;
-    }
-    .row {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-left: 200px !important;
-    }
-  </style>
-  <link rel="stylesheet" href="https://bootswatch.com/4/lux/bootstrap.min.css">
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
   <body>
-    <script>
-    
-
-
-  function statusChangeCallback(response) {
-    console.log('statusChangeCallback');
-    console.log(response);
-    if (response.status === 'connected') {
-      // Logged into your app and Facebook.
-      localStorage.setItem('access_token',response.authResponse.accessToken)
-      testAPI();
-      $('.fbButton').remove()
-    } else {
-      document.getElementById('status').innerHTML = 'Please log ' +
-        'into this app.';
-    }
-  }
-  function checkLoginState() {
-    FB.getLoginStatus(function(response) {
-      statusChangeCallback(response);
-    });
-  }
-  function createNewUser(userData) {
-    axios.post('http://localhost:3000/users',{
-      name: userData
-    })
-    .then(result => {
-      console.log(result)
-    })
-    .catch(err => {
-      console.log(err)
-    })
-  }
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '364179410749677',
-      cookie     : true,  // enable cookies to allow the server to access 
-                          // the session
-      xfbml      : true,  // parse social plugins on this page
-      version    : 'v2.8' // use graph api version 2.8
-    });
-    FB.getLoginStatus(function(response) {
-      statusChangeCallback(response);
-    });
-
-  };
-
-  // Load the SDK asynchronously
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "https://connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-  let user = ''
-  function testAPI() {
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-      console.log('Successful login for: ' + response.name);
-      localStorage.setItem('user', response.name)
-      createNewUser(response.name)
-      document.getElementById('status').innerHTML =
-        'Thanks for logging in, ' + response.name + '!';
-    });
-  }
-  let dataBMI = ''
-
-    function getBMI () {
-      console.log($('#weight').val())
-      axios.post('http://localhost:3000/bmi', {
-        height: $('#height').val(),
-        weight: $('#weight').val()
-      })
-      .then(response => {
-        console.log(response.data)
-         dataBMI = response.data
-         axios.post('http://localhost:3000/users/updateBMI',{
-           bodyType: response.data.status,
-           name: localStorage.getItem('user')
-         })
-         .then(result => {
-           console.log(result)
-         })
-         .catch(err => {
-           console.log(err)
-         })
-        $(`.row`).append(`<div class="col-sm-4">
-            <div class="card border-success mb-3" style="max-width: 20rem;">
-            <div class="card-header">RESULT</div>
-            <div class="card-body text-success">
-              <h4 class="card-title">${response.data.status}</h4>
-              <p class="card-text">if you are a woman, your ideal weight is ${response.data.ideal_weight.woman}</p>
-              <p class="card-text">if you are a man, your ideal weight is ${response.data.ideal_weight.man}</p>
-            </div>
-          </div>
-          </div>
-          <button type="button" class="btn btn-outline-success" onclick="getRecipes()">Get Recipes</button>`)
-      })
-      .catch(err => {
-        console.log(err)
-      })
-    }
-    
-    // function getRecipes () {
-    //   axios.get('http://localhost:3000/api/foods?q=')
-    // }
-</script>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="#">RBmI</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation" style="">
@@ -155,11 +48,11 @@
   <div class="fbButton">
     <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
     </fb:login-button>
-
     <div id="status">
     </div>
   </div>
-
+  
+  
   <div class="form-group">
     <label class="col-form-label" for="inputDefault">Please enter your weight</label>
     <input type="text" class="form-control" placeholder="Your height in Kilogram" id="weight">
@@ -171,10 +64,21 @@
   </div>
       <button type="button" class="btn btn-outline-success" onclick="getBMI()">Get BMI</button>
 </div>
+<br><br>
 
-<div class="row">
-
+<h3 class="content">BMI Result</h3>
+<div id="rowBMI">
 </div>
+<br><br>
 
+<h3 class="content">Recipes</h3>
+<div id="rowRecipes">
+</div>
+<br><br>
   </body>
+  <script
+  src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="./index.js" charset="utf-8"></script>
 </html>
