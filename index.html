@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style media="screen">
+      .container {
+        margin-top: 40px;
+      }
+      #rowBMI {
+        display:-webkit-box !important;
+        flex-direction: column;
+        align-items: center;
+        margin-left: 80px !important;
+      }
+      .content {
+        margin-left: 80px;
+      }
+    </style>
+    <link rel="stylesheet" href="https://bootswatch.com/4/lux/bootstrap.min.css">
+  </head>
+
+
+  <body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">RBmI</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation" style="">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  
+
+  <div class="collapse navbar-collapse" id="navbarColor03">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+  </div>
+</nav>
+<div class="container">
+  <h3>
+    Recipe API
+    <small class="text-muted">with BMI Calculator</small>
+  </h3>
+</div>
+
+
+<div class="container">
+  <div class="fbButton">
+    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+    </fb:login-button>
+    <div id="status">
+    </div>
+  </div>
+  
+  
+  <div class="form-group">
+    <label class="col-form-label" for="inputDefault">Please enter your weight</label>
+    <input type="text" class="form-control" placeholder="Your height in Kilogram" id="weight">
+  </div>
+  <div class="form-group">
+    <label class="col-form-label" for="inputDefault">Please enter your height</label>
+    <input type="text" class="form-control" placeholder="your height in Meter" id="height">
+    <br>
+  </div>
+      <button type="button" class="btn btn-outline-success" onclick="getBMI()">Get BMI</button>
+</div>
+<br><br>
+
+<h3 class="content">BMI Result</h3>
+<div id="rowBMI">
+</div>
+<br><br>
+
+<h3 class="content">Recipes</h3>
+<div id="rowRecipes">
+</div>
+<br><br>
+  </body>
+  <script
+  src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="./index.js" charset="utf-8"></script>
+</html>
