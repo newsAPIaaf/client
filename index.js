@@ -9,10 +9,19 @@ if (response.status === 'connected') {
   localStorage.setItem('access_token',response.authResponse.accessToken)
   testAPI();
   $('.fbButton').remove()
+  $('#fbLogout').show()
 } else {
   document.getElementById('status').innerHTML = 'Please log ' +
     'into this app.';
 }
+}
+
+function fbLogout() {
+  FB.logout(function (response) {
+    console.log(response, 'logout');
+    $('#fbLogout').remove()
+    $('.fbButton').show()
+  })
 }
 function checkLoginState() {
 FB.getLoginStatus(function(response) {
@@ -98,7 +107,7 @@ function getBMI () {
           <h4 class="card-title">${response.data.status}</h4>
           <p class="card-text">if you are a woman, your ideal weight is ${response.data.ideal_weight.woman}</p>
           <p class="card-text">if you are a man, your ideal weight is ${response.data.ideal_weight.man}</p>
-          <button type="button" class="btn btn-outline-success" onclick="getRecipes('', '${response.data.status}')">Get Recipes</button>
+          <button type="button" class="btn btn-outline-success" onclick="getRecipes('', '${response.data.status}')">Get All Recipes</button>
         </div>
         <div class="row">
           <div class="form-group">
@@ -123,11 +132,11 @@ function getRecipes(food, status) {
       console.log(response.data);
       if (status.indexOf('Obesity') !== -1 || status.indexOf('Overweight') !== -1) {
         result = response.data.foods.filter(food => {
-          return (food.diet[0].indexOf('Low-Carb') !== -1)
+          return (food.diet.indexOf('Low-Carb') !== -1 || food.diet.indexOf('Balanced') !== -1 || food.diet.indexOf('Low-Fat') !== -1 || food.diet.indexOf('Low-Protein') !== -1)
         })
       } else {
         result = response.data.foods.filter(food => {
-          return food.diet[0].indexOf('Low-Carb') == -1
+          return (food.diet.indexOf('Low-Carb') == -1 && food.diet.indexOf('Low-Fat') == -1)
         })
       }
       $(`#rowRecipes`).html('')
@@ -143,7 +152,7 @@ function getRecipes(food, status) {
                   <img class="center" src="${element_food.image}" height="150" width="150">
                   <p class="card-text">ingredients    : ${element_food.ingredient.join(', ')}</p>
                   <p class="card-text">health benefit : ${element_food.health.join(', ')}</p>
-                  <button type="button" class="btn btn-outline-success" onclick="sentEmail()">Send Recipe</button>
+                  <button type="button" class="btn btn-outline-success" onclick="sendEmail('${{element_food}}')">Send Recipe</button>
                 </div>
               </div>
             </div>
@@ -166,37 +175,62 @@ function getRecipes(food, status) {
       if (status.indexOf('Obesity') !== -1 || status.indexOf('Overweight') !== -1) {
         result = response.data.foods.filter(food => {
           console.log(food);
-          return (food.diet.indexOf('Low-Carb') !== -1 || food.diet.indexOf('Balanced') !== 1)
+          return (food.diet.indexOf('Low-Carb') !== -1 || food.diet.indexOf('Balanced') !== -1 || food.diet.indexOf('Low-Fat') !== -1 || food.diet.indexOf('Low-Protein') !== -1)
         })
       } else {
         result = response.data.foods.filter(food => {
-          return food.diet.indexOf('Low-Carb') == -1
+          return (food.diet.indexOf('Low-Carb') == -1 && food.diet.indexOf('Low-Fat') == -1)
         })
       }
       $(`#rowRecipes`).html('')
-      result.forEach(element_food => {
-        console.log(element_food);
-        $(`#rowRecipes`).append(`
-          <div class="col-md-3">
-            <div class="card border-success mb-3" style="max-width: 20rem;">
-              <div class="card-header">RESULT</div>
-              <div class="card-body text-success">
-                <h4 class="card-title">${element_food.name}</h4>
-                <img class="center" src="${element_food.image}" height="150" width="150">
-                <p class="card-text">ingredients    : ${element_food.ingredient.join(', ')}</p>
-                <p class="card-text">health benefit : ${element_food.health.join(', ')}</p>
-                <button type="button" class="btn btn-outline-success" onclick="sentEmail()">Send Recipe</button>
+      if (result.length > 0) {
+        result.forEach(element_food => {
+          console.log(element_food);
+          $(`#rowRecipes`).append(`
+            <div class="col-md-3">
+              <div class="card border-success mb-3" style="max-width: 20rem;">
+                <div class="card-header">RESULT</div>
+                <div class="card-body text-success">
+                  <h4 class="card-title">${element_food.name}</h4>
+                  <img class="center" src="${element_food.image}" height="150" width="150">
+                  <p class="card-text">ingredients    : ${element_food.ingredient.join(', ')}</p>
+                  <p class="card-text">health benefit : ${element_food.health.join(', ')}</p>
+                  <button type="button" class="btn btn-outline-success" onclick="sendEmail('${element_food.name}', '${element_food.ingredient}', '${element_food.image}', '${element_food.health}', '${element_food.diet}')">Send Recipe</button>
+                </div>
               </div>
             </div>
-          </div>
+            `)
+        })
+      } else {
+        $(`#rowRecipes`).append(`
+          <h4 class="text-muted"> No ${status} diet's recipes available </h4>
           `)
-      })
+      }
     })
     .catch(function (error) {
       console.log(error);
     });
   }
 
+}
+
+function sendEmail(name, ingredient, image, health, diet) {
+  console.log(ingredient, 'ini ingre');
+  console.log(image, 'ini image');
+  axios.post(`http://localhost:3000/api/foods`, {
+    email : localStorage.getItem('email'),
+    ingredient : ingredient,
+    name  : name,
+    image : image,
+    health: health,
+    diet : diet
+  })
+  .then(response => {
+    console.log(response)
+  })
+  .catch(err => {
+    console.log(err)
+  })
 }
 
 // function getRecipes () {
