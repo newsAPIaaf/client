@@ -87,6 +87,7 @@ function getBMI () {
      .catch(err => {
        console.log(err)
      })
+
     $(`#rowBMI`).html('')
     $(`#rowRecipes`).html('')
     $(`#rowBMI`).append(`
@@ -100,10 +101,11 @@ function getBMI () {
           <button type="button" class="btn btn-outline-success" onclick="getRecipes('', '${response.data.status}')">Get Recipes</button>
         </div>
         <div class="row">
-          <button type="button" onclick="getRecipes('chicken', '${response.data.status}')" class="btn btn-primary btn-sm">Chicken</button>
-          <button type="button" onclick="getRecipes('rice', '${response.data.status}')" class="btn btn-primary btn-sm">Rice</button>
-          <button type="button" onclick="getRecipes('fish', '${response.data.status}')" class="btn btn-primary btn-sm">Fish</button>
-        </div>
+          <div class="form-group">
+            <label class="col-form-label col-form-label-sm" for="inputSmall">Search</label>
+            <input class="form-control form-control-sm" type="text" placeholder="your food" id="search">
+            <span class="badge badge-pill badge-success" onclick="getRecipes(($('#search').val()), '${response.data.status}')">Search</span>
+          </div>
       </div>
       </div>
       `)
@@ -121,7 +123,7 @@ function getRecipes(food, status) {
       console.log(response.data);
       if (status.indexOf('Obesity') !== -1 || status.indexOf('Overweight') !== -1) {
         result = response.data.foods.filter(food => {
-          return food.diet[0].indexOf('Low-Carb') !== -1
+          return (food.diet[0].indexOf('Low-Carb') !== -1)
         })
       } else {
         result = response.data.foods.filter(food => {
