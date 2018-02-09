@@ -129,23 +129,29 @@ function getRecipes(food, status) {
         })
       }
       $(`#rowRecipes`).html('')
-      result.forEach(element_food => {
-        console.log(element_food);
-        $(`#rowRecipes`).append(`
-          <div class="col-md-3">
-            <div class="card border-success mb-3" style="max-width: 20rem;">
-              <div class="card-header">RESULT</div>
-              <div class="card-body text-success">
-                <h4 class="card-title">${element_food.name}</h4>
-                <img class="center" src="${element_food.image}" height="150" width="150">
-                <p class="card-text">ingredients    : ${element_food.ingredient.join(', ')}</p>
-                <p class="card-text">health benefit : ${element_food.health.join(', ')}</p>
-                <button type="button" class="btn btn-outline-success" onclick="sentEmail()">Send Recipe</button>
+      if (result.length > 0) {
+        result.forEach(element_food => {
+          console.log(element_food);
+          $(`#rowRecipes`).append(`
+            <div class="col-md-3">
+              <div class="card border-success mb-3" style="max-width: 20rem;">
+                <div class="card-header">RESULT</div>
+                <div class="card-body text-success">
+                  <h4 class="card-title">${element_food.name}</h4>
+                  <img class="center" src="${element_food.image}" height="150" width="150">
+                  <p class="card-text">ingredients    : ${element_food.ingredient.join(', ')}</p>
+                  <p class="card-text">health benefit : ${element_food.health.join(', ')}</p>
+                  <button type="button" class="btn btn-outline-success" onclick="sentEmail()">Send Recipe</button>
+                </div>
               </div>
             </div>
-          </div>
+            `)
+        })
+      } else {
+        $(`#rowRecipes`).append(`
+          <h4 class="text-muted"> No ${status} diet's recipes available </h4>
           `)
-      })
+      }
     })
     .catch(function (error) {
       console.log(error);
