@@ -143,7 +143,7 @@ function getRecipes(food, status) {
                   <img class="center" src="${element_food.image}" height="150" width="150">
                   <p class="card-text">ingredients    : ${element_food.ingredient.join(', ')}</p>
                   <p class="card-text">health benefit : ${element_food.health.join(', ')}</p>
-                  <button type="button" class="btn btn-outline-success" onclick="sentEmail()">Send Recipe</button>
+                  <button type="button" class="btn btn-outline-success" onclick="sendEmail(${element_food}">Send Recipe</button>
                 </div>
               </div>
             </div>
@@ -185,7 +185,7 @@ function getRecipes(food, status) {
                 <img class="center" src="${element_food.image}" height="150" width="150">
                 <p class="card-text">ingredients    : ${element_food.ingredient.join(', ')}</p>
                 <p class="card-text">health benefit : ${element_food.health.join(', ')}</p>
-                <button type="button" class="btn btn-outline-success" onclick="sentEmail()">Send Recipe</button>
+                <button type="button" class="btn btn-outline-success" onclick="sendEmail(${element_food})">Send Recipe</button>
               </div>
             </div>
           </div>
@@ -197,6 +197,21 @@ function getRecipes(food, status) {
     });
   }
 
+}
+
+function sendEmail(recipe) {
+  axios.post(`http://localhost:3000/api/foods`, {
+    email : localStorage.getItem('email'),
+    ingredient : recipe.ingredient,
+    name  : recipe.name,
+    image : recipe.image
+  })
+  .then(response => {
+    console.log(response)
+  })
+  .catch(err => {
+    console.log(err)
+  })
 }
 
 // function getRecipes () {
